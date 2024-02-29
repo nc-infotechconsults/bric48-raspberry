@@ -1,20 +1,11 @@
 #import paho.mqtt.client as mqtt
 from bluepy.btle import Scanner, DefaultDelegate
-import time
 import requests
-from datetime import datetime
-import platform
-import uuid
+from getmac import get_mac_address as gma
 
 '''ID HEADPHONES'''
 
-def get_mac_address():
-    mac_num = hex(uuid.getnode()).replace('0x', '').upper()
-    mac = '-'.join(mac_num[i: i + 2] for i in range(0, 11, 2))
-    return mac
-
-idHeadphones = get_mac_address()
-
+idHeadphones = gma()
 
 
 '''GET di tutti i macchinari'''
@@ -27,7 +18,6 @@ if response.status_code == 200:
 
     # Decodifica la risposta JSON
     machineries = response.json()
-
 
 else:
     # Stampa un messaggio di errore
@@ -76,9 +66,26 @@ class ScanDelegate(DefaultDelegate):
                 if dev.addr in macs:
 
                     if dev.rssi > -60 and machinery_flag[mserial] == False:
+
+                        # Esegui la richiesta GET
+                        response = requests.get("http://192.168.1.108:8080/machinery/find/machinery/" + mserial)
+
+                        # Controlla lo stato della risposta
+                        if response.status_code == 200:
+
+                            # Decodifica la risposta JSON
+                            m = response.json()
+
+                        else:
+                            # Stampa un messaggio di errore
+                            print("Errore durante la richiesta GET:", response.status_code)
+
+
                         payload = {
                             "serial": idHeadphones,
-                            "mserial": mserial
+                            "mserial": mserial,
+                            "idRoom": m["idRoom"],
+                            "idBranch": m["idBranch"]
                         }
                         headers = {'Content-Type': 'application/json'}
                         r = requests.post("http://192.168.1.108:8080/nearbyHeadphones/add", json=payload, headers=headers)
