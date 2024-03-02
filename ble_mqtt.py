@@ -108,12 +108,7 @@ class ScanDelegate(DefaultDelegate):
                             print("Errore nella richiesta:", r.status_code)
                         
                     elif dev.rssi <= -60 and machinery_flag[mserial] == True:
-                        payload = {
-                            "serial": idHeadphones,
-                            "mserial": mserial
-                        }
-                        headers = {'Content-Type': 'application/json'}
-                        r = requests.delete("http://"+backend_ip+":8080/nearbyHeadphones/delete", json=payload, headers=headers)
+                        r = requests.delete("http://"+backend_ip+":8080/nearbyHeadphones/delete?serial="+idHeadphones+"&mserial="+mserial)
 
                         if r.status_code == 200:
                             machinery_flag[mserial] = False
