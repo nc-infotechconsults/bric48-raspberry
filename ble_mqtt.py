@@ -1,4 +1,4 @@
-#import paho.mqtt.client as mqtt
+import paho.mqtt.client as mqtt
 from bluepy.btle import Scanner, DefaultDelegate
 import requests
 from getmac import get_mac_address as gma
@@ -14,9 +14,37 @@ if len(args) < 2:
 
 backend_ip = args[1]
 
+
+''' MQTT '''
+
+# Callback chiamata quando il client si connette al broker
+def on_connect(client, userdata, flags, rc):
+    print("Connesso al broker con codice risultato: " + str(rc))
+
+# Callback chiamata quando un messaggio viene ricevuto sul topic sottoscritto
+def on_message(client, userdata, msg):
+    print(f"\nTopic {msg.topic} \nMessaggio: {str(msg.payload)}\n")
+
+# Configurazione del client MQTT
+client = mqtt.Client()
+
+# Impostazione delle callback
+client.on_connect = on_connect
+client.on_message = on_message
+
+
+# Connessione al broker MQTT
+client.connect("test.mosquitto.org", 1883, 60)
+
+# Loop di rete per gestire le connessioni e i messaggi in entrata
+client.loop_start()
+
+
 '''ID HEADPHONES'''
 
 idHeadphones = gma()
+
+print("ID Headphone: ", idHeadphones)
 
 
 
@@ -61,8 +89,11 @@ for machinery in machineries:
     else:
         print("Errore durante la richiesta GET:", response.status_code)
     
-print(mserial_beacon)
-print(machinery_flag)
+#print(mserial_beacon)
+#print(machinery_flag)
+
+client.subscribe("/"+idHeadphones)
+
 
 '''Scansione bluetooth'''
 
@@ -78,6 +109,8 @@ class ScanDelegate(DefaultDelegate):
                 if dev.addr in macs:
 
                     if dev.rssi > -60 and machinery_flag[mserial] == False:
+
+                        client.subscribe("/"+mserial)
 
                         # Esegui la richiesta GET
                         response = requests.get("http://"+backend_ip+":8080/machinery/find/machinery/" + mserial)
@@ -108,6 +141,9 @@ class ScanDelegate(DefaultDelegate):
                             print("Errore nella richiesta:", r.status_code)
                         
                     elif dev.rssi <= -60 and machinery_flag[mserial] == True:
+
+                        client.unsubscribe("/"+mserial)
+
                         r = requests.delete("http://"+backend_ip+":8080/nearbyHeadphones/delete?serial="+idHeadphones+"&mserial="+mserial)
 
                         if r.status_code == 200:
@@ -136,14 +172,11 @@ except KeyboardInterrupt:
 
     if r.status_code == 200:
         print("Disconnessione della cuffia riuscita")
+        client.disconnect()
     else:
         print("Errore nella richiesta:", r.status_code)
 
 
-
-
-#Quando vicino a un beacon POST sull'api nearbyHeadphones corrispondente
-#Quando lontano da un beacon bisogna fare DELETE di nearbyHeadphones
 
 '''
 
