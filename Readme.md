@@ -8,11 +8,20 @@
 Probabilmente ci sono altre dipendenze da installare per cui non è necessario usare sudo  
 
 ## Comando per avviare
-> sudo python3 ble_mqtt.py <url_backend>
+> sudo python3 ble_mqtt.py <ip_backend>
 
 
 # COMANDI DA ESEGUIRE PER SILERO
 
 ## Dipendenze da installare 
+> sudo pip3 install numpy --break-system-packages  
+> sudo pip3 install torch --break-system-packages  
+> sudo pip3 install torchaudio --break-system-packages  
+> sudo apt-get install portaudio19-dev  
+> sudo pip3 install pyaudio --break-system-packages  
+> sudo pip3 install pyside6 --break-system-packages  
+> sudo pip3 install scikit-maad --break-system-packages  
 
-## Comando per avviare
+
+## Comando per avviare  
+> sudo python3 silero+leq.py
