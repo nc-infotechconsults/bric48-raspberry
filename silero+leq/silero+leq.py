@@ -94,8 +94,7 @@ while True:
         channels=CHANNELS,
         rate=SAMPLE_RATE,
         input=True,
-        frames_per_buffer=CHUNK,
-        input_device_index=DEV)
+        frames_per_buffer=CHUNK)
 
     frames = []                  
     print("\n * init recording")                          
