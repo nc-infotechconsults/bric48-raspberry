@@ -1,4 +1,3 @@
-#prima di tutto importiamo tutte le librerie e le dipendenze necessarie
 import io
 import numpy as np
 import torch
@@ -66,7 +65,7 @@ CHUNK = int(SAMPLE_RATE / 10) #ogni chunck sono 1600 campioni
 #settaggio gain e sensibilità
 gai=8
 sens=-32
-reg_leng=1
+reg_leng=0.5  # aggiornato a un quarto di secondo
 pond="Z"
 _MIN_ = sys.float_info.min
 #finestratura
@@ -96,8 +95,7 @@ while True:
         input=True,
         frames_per_buffer=CHUNK)
 
-    frames = []                  
-    print("\n * init recording")                          
+    frames = []                                            
     for i in range(0, nfin):
         data = stream.read(CHUNK, exception_on_overflow=False)
         frames.append(data)         
@@ -105,8 +103,7 @@ while True:
         audio_float32 = int2float(audio_int16) # converte i campioni a 16 bit in 32 bit usando la funzione prima definita
         new_confidence = model(torch.from_numpy(audio_float32), 16000).item() # passiamo al modello il campione in 32 bit per
 
-    print("* done recording")
-    print("livello della voce: ", new_confidence)                    
+    #print("livello della voce: ", new_confidence)                    
     stream.stop_stream()
     stream.close()
     #normalizzazione del segnale fatta UNIPG
@@ -118,7 +115,8 @@ while True:
     #equivalent sound pressure level 
     #questi è il leq del singolo pezzo
     Leq_result = spl.wav2leq (w, SAMPLE_RATE, gain=gai,dt=len(w)/SAMPLE_RATE , sensitivity=sens)
-    print("Equivalent Continuous Sound pressure Level Leq (dB):", mcr.decimali(Leq_result))
+    #print("Equivalent Continuous Sound pressure Level Leq (dB):", mcr.decimali(Leq_result))
+    print("voce: ", new_confidence," LEQ: ", mcr.decimali(Leq_result))
     Lp=mcr.levelsoct(sound_pressure, pond)
     t=t+t_true
     s=0
@@ -127,7 +125,7 @@ while True:
         s=s+summ
         #questo è il leq totale
         Leq=mcr.decimali(10*np.log10((1/1)*s))
-    print("Leq (dB): ", Leq)
+    #print("Leq (dB): ", Leq)
                 
             
     #questo è il livello equivalente mediato su tutto il periodo
