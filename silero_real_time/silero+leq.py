@@ -28,12 +28,10 @@ model, utils = torch.hub.load(repo_or_dir='snakers4/silero-vad',
  VADIterator,
  collect_chunks) = utils
 
-def validate(model,
-             inputs: torch.Tensor):
+def validate(model, inputs: torch.Tensor):
     with torch.no_grad():
         outs = model(inputs)
     return outs
-
 
 def int2float(sound):
     abs_max = np.abs(sound).max()
@@ -45,27 +43,20 @@ def int2float(sound):
 
 ################################################# LEQ
 
-
 p = pyaudio.PyAudio()
 info = p.get_host_api_info_by_index(0)
 numdevices = info.get('deviceCount')
-
-for i in range(numdevices):
-    if (p.get_device_info_by_index(i).get('maxInputChannels')) > 0:
-        print("Input Device id ", i, " - ", p.get_device_info_by_index(i).get('name'))
-        if(p.get_device_info_by_index(i).get('name') == "default"):
-            DEV = i # setting the device
 
 ################################################# ENTRAMBI
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
-SAMPLE_RATE = 16000
+SAMPLE_RATE = 48000
 CHUNK = int(SAMPLE_RATE / 10) #ogni chunck sono 1600 campioni
 #settaggio gain e sensibilità
 gai=8
 sens=-32
-reg_leng=0.5  # aggiornato a un quarto di secondo
+reg_leng=1  # aggiornato a un quarto di secondo
 pond="Z"
 _MIN_ = sys.float_info.min
 #finestratura
@@ -87,21 +78,33 @@ global line
 
 ################################################# MAIN LOOP
 
+# Resample transformation
+resample_transform = torchaudio.transforms.Resample(orig_freq=SAMPLE_RATE, new_freq=16000)
+
+# Obtain and print the input device name
+#DEV = 1  # Adjust this index based on your needs
+#device_info = p.get_device_info_by_index(DEV)
+#input_device_name = device_info['name']
+#print("Input device name:", input_device_name)
+
 while True: 
-    
     stream = p.open(format=FORMAT,
-        channels=CHANNELS,
-        rate=SAMPLE_RATE,
-        input=True,
-        frames_per_buffer=CHUNK)
+                    channels=CHANNELS,
+                    rate=SAMPLE_RATE,
+                    input=True,
+                    #input_device_index=DEV,
+                    frames_per_buffer=CHUNK)
 
     frames = []                                            
     for i in range(0, nfin):
         data = stream.read(CHUNK, exception_on_overflow=False)
         frames.append(data)         
-        audio_int16 = np.frombuffer(data, np.int16); # converte i dati grezzi che ha letto in campioni audio a 16 bit
+        audio_int16 = np.frombuffer(data, np.int16) # converte i dati grezzi che ha letto in campioni audio a 16 bit
         audio_float32 = int2float(audio_int16) # converte i campioni a 16 bit in 32 bit usando la funzione prima definita
-        new_confidence = model(torch.from_numpy(audio_float32), 16000).item() # passiamo al modello il campione in 32 bit per
+        
+        # Resample from 48000 Hz to 16000 Hz
+        audio_resampled = resample_transform(torch.from_numpy(audio_float32))
+        new_confidence = model(audio_resampled, 16000).item() # passiamo al modello il campione in 32 bit
 
     #print("livello della voce: ", new_confidence)                    
     stream.stop_stream()
@@ -114,7 +117,7 @@ while True:
     sound_pressure = spl.wav2pressure(wave=w, gain=gai, sensitivity=sens)
     #equivalent sound pressure level 
     #questi è il leq del singolo pezzo
-    Leq_result = spl.wav2leq (w, SAMPLE_RATE, gain=gai,dt=len(w)/SAMPLE_RATE , sensitivity=sens)
+    Leq_result = spl.wav2leq(w, SAMPLE_RATE, gain=gai, dt=len(w)/SAMPLE_RATE, sensitivity=sens)
     #print("Equivalent Continuous Sound pressure Level Leq (dB):", mcr.decimali(Leq_result))
     print("voce: ", new_confidence," LEQ: ", mcr.decimali(Leq_result))
     Lp=mcr.levelsoct(sound_pressure, pond)
