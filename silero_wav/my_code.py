@@ -3,14 +3,19 @@ import numpy as np
 import torch
 torch.set_num_threads(1)
 import torchaudio
-import matplotlib
-import matplotlib.pylab as plt
-torchaudio.set_audio_backend("soundfile")
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 import pyaudio
+import threading
+import time
+import argparse
 
-import datetime
+# Argument parser for file path
+parser = argparse.ArgumentParser(description="Voice Activity Detection with Real-Time Plotting")
+parser.add_argument('file_path', type=str, help='Path to the audio file')
+args = parser.parse_args()
 
-
+torchaudio.set_audio_backend("soundfile")
 model, utils = torch.hub.load(repo_or_dir='snakers4/silero-vad',
                               model='silero_vad',
                               force_reload=False)
@@ -21,25 +26,21 @@ model, utils = torch.hub.load(repo_or_dir='snakers4/silero-vad',
  VADIterator,
  collect_chunks) = utils
 
-
-
 def int2float(sound):
     abs_max = np.abs(sound).max()
     sound = sound.astype('float32')
     if abs_max > 0:
         sound *= 1/32768
-    sound = sound.squeeze()  # depends on the use case
+    sound = sound.squeeze()
     return sound
-
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 SAMPLE_RATE = 16000
-CHUNK = int(SAMPLE_RATE / 10) #ogni chunck sono 1600 campioni
+CHUNK = 512  # Changed chunk size to 512
 audio = pyaudio.PyAudio()
 
-file_path = 'test1.wav'  
-
+file_path = args.file_path
 waveform, sample_rate = torchaudio.load(file_path)
 
 target_sample_rate = 16000
@@ -47,52 +48,72 @@ if sample_rate != target_sample_rate:
     resampler = torchaudio.transforms.Resample(orig_freq=sample_rate, new_freq=target_sample_rate)
     waveform = resampler(waveform)
 
+# Convert to mono if stereo
+if waveform.shape[0] > 1:
+    waveform = waveform.mean(dim=0, keepdim=True)
 
-# Calcola la lunghezza totale del waveform
-total_samples = waveform.size(1)
+# Convert PyTorch tensor to numpy array
+waveform_numpy = waveform.squeeze().numpy()
+audio_int16 = (waveform_numpy * 32768).astype(np.int16)
+audio_float32 = int2float(audio_int16)
 
-# Specifica la dimensione del chunk
-chunk_size = 512
+stream = audio.open(format=FORMAT,
+                    channels=CHANNELS,
+                    rate=SAMPLE_RATE,
+                    output=True)
 
-# Calcola il numero di chunk
-num_chunks = (total_samples + chunk_size - 1) // chunk_size
+fig, ax = plt.subplots(figsize=(20, 6))
+ax.set_xlim(0, len(audio_float32) / SAMPLE_RATE)
+ax.set_ylim(0, 1)
+line, = ax.plot([], [], lw=2)
+ax.set_xlabel('Time (seconds)')
+ax.set_ylabel('Voice Confidence')
+ax.set_title('Voice Activity Detection')
+ax.grid(True)
 
 voiced_confidences = []
+time_points = []
+start_time = None
 
-# Iterare sui chunk di 512 campioni
-for i in range(num_chunks):
-    start = i * chunk_size
-    end = start + chunk_size
-    chunk = waveform[:, start:end]
-    if chunk.shape[1] < chunk_size:
-        # Zero-padding se il chunk è più corto di 512 campioni
-        chunk = torch.nn.functional.pad(chunk, (0, chunk_size - chunk.shape[1]))
-
-    # Convert to mono if stereo
-    if chunk.shape[0] > 1:
-        chunk = chunk.mean(dim=0, keepdim=True)
-
-    # Convert PyTorch tensor to numpy array
-    chunk_numpy = chunk.squeeze().numpy()
+def update_plot(frame):
+    global voiced_confidences, time_points, start_time
     
-    # Ensure the data is in the correct format (int16)
-    audio_int16 = (chunk_numpy * 32768).astype(np.int16)
+    if start_time is None:
+        start_time = time.time()
     
-    audio_float32 = int2float(audio_int16)
-    new_confidence = model(torch.from_numpy(audio_float32), 16000).item()
+    elapsed_time = time.time() - start_time
+    frame_index = int(elapsed_time * SAMPLE_RATE // CHUNK)
+    
+    if frame_index * CHUNK >= len(audio_float32):
+        return line,
+    
+    start = frame_index * CHUNK
+    end = start + CHUNK
+    chunk = audio_float32[start:end]
+    
+    if len(chunk) < CHUNK:
+        chunk = np.pad(chunk, (0, CHUNK - len(chunk)))
+    
+    new_confidence = model(torch.from_numpy(chunk), SAMPLE_RATE).item()
     voiced_confidences.append(new_confidence)
+    time_points.append(elapsed_time)
+    
+    line.set_data(time_points, voiced_confidences)
+    
+    return line,
 
-# Calculate the duration of each chunk in seconds
-chunk_duration = chunk_size / SAMPLE_RATE
+def play_audio():
+    stream.write(audio_int16.tobytes())
+    stream.stop_stream()
+    stream.close()
+    audio.terminate()
 
-# Create an array of time points in seconds
-time_points = np.arange(len(voiced_confidences)) * chunk_duration
+audio_thread = threading.Thread(target=play_audio)
+audio_thread.start()
 
-plt.figure(figsize=(20, 6))
-plt.plot(time_points, voiced_confidences)
-plt.xlabel('Time (seconds)')
-plt.ylabel('Voice Confidence')
-plt.title('Voice Activity Detection')
-plt.grid(True)
+ani = animation.FuncAnimation(fig, update_plot, frames=range(0, len(audio_float32) // CHUNK),
+                              interval=(CHUNK / SAMPLE_RATE) * 1000, blit=True)
+
 plt.show()
 
+audio_thread.join()
