@@ -70,7 +70,7 @@ else:
 mserial_beacon = {}
 mserial_threshold = {}
 
-machinery_flag = {}
+mserial_flag = {}
 
 for machinery in machineries:
 
@@ -90,7 +90,7 @@ for machinery in machineries:
 
         mserial_beacon[machinery["mserial"]] = macs
         mserial_threshold[machinery["mserial"]] = thresholds
-        machinery_flag[machinery["mserial"]] = False
+        mserial_flag[machinery["mserial"]] = [0] * len(macs)
     else:
         print("Errore durante la richiesta GET:", response.status_code)
     
@@ -108,59 +108,76 @@ class ScanDelegate(DefaultDelegate):
         DefaultDelegate.__init__(self)
 
     def handleDiscovery(self, dev, isNewDev, isNewData):
-        #global machinery_flag
+
         if isNewDev or isNewData:
             for mserial, macs in mserial_beacon.items():
                 if dev.addr in macs:
 
                     idx = macs.index(dev.addr)
 
-                    if dev.rssi > -int(mserial_threshold[mserial][idx]) and machinery_flag[mserial] == False:
+                    # RSSI sopra la soglia
+                    if dev.rssi > -int(mserial_threshold[mserial][idx]):
 
-                        client.subscribe("/"+mserial)
+                        if mserial_flag[mserial][idx] == 0:
+                            
+                            mserial_flag[mserial][idx] = 1
 
-                        print("subribed con threshold ", -(int(mserial_threshold[mserial][idx])))
+                            print(mserial_flag[mserial])
+                            
+                            flag = True
 
-                        # Esegui la richiesta GET
-                        response = requests.get("http://"+backend_ip+":8080/machinery/find/machinery/" + mserial)
+                            for i in range(0, len(macs)):
+                                if i != idx:
+                                    if mserial_flag[mserial][i] == 1:
+                                        flag = False
 
-                        # Controlla lo stato della risposta
-                        if response.status_code == 200:
+                            if flag == True:
+                                client.subscribe("/"+mserial)
+                                print("subscribed con threshold ", -(int(mserial_threshold[mserial][idx])))
 
-                            # Decodifica la risposta JSON
-                            m = response.json()
+                                response = requests.get("http://"+backend_ip+":8080/machinery/find/machinery/" + mserial)
 
-                        else:
-                            # Stampa un messaggio di errore
-                            print("Errore durante la richiesta GET:", response.status_code)
+                                if response.status_code == 200:
+                                    m = response.json()
+                                else:
+                                    print("Errore durante la richiesta GET:", response.status_code)
 
+                                payload = {
+                                    "serial": idHeadphones,
+                                    "mserial": mserial,
+                                    "idRoom": m["idRoom"],
+                                    "idBranch": m["idBranch"]
+                                }
+                                headers = {'Content-Type': 'application/json'}
+                                r = requests.post("http://"+backend_ip+":8080/nearbyHeadphones/add", json=payload, headers=headers)
 
-                        payload = {
-                            "serial": idHeadphones,
-                            "mserial": mserial,
-                            "idRoom": m["idRoom"],
-                            "idBranch": m["idBranch"]
-                        }
-                        headers = {'Content-Type': 'application/json'}
-                        r = requests.post("http://"+backend_ip+":8080/nearbyHeadphones/add", json=payload, headers=headers)
+                                if r.status_code != 200:
+                                    print("Errore nella richiesta:", r.status_code)
+                    
+                    # RSSI sotto la soglia
+                    else:
 
-                        if r.status_code == 200:
-                            machinery_flag[mserial] = True
-                        else:
-                            print("Errore nella richiesta:", r.status_code)
-                        
-                    elif dev.rssi <= -(int(mserial_threshold[mserial][idx])) and machinery_flag[mserial] == True:
+                        if mserial_flag[mserial][idx] == 1:
 
-                        client.unsubscribe("/"+mserial)
+                            mserial_flag[mserial][idx] = 0
 
-                        print("unsubscribed")
+                            print(mserial_flag[mserial])
+                            
+                            flag = True
 
-                        r = requests.delete("http://"+backend_ip+":8080/nearbyHeadphones/delete?serial="+idHeadphones+"&mserial="+mserial)
+                            for i in range(0, len(macs)):
+                                if i != idx:
+                                    if mserial_flag[mserial][i] == 1:
+                                        flag = False
 
-                        if r.status_code == 200:
-                            machinery_flag[mserial] = False
-                        else:
-                            print("Errore nella richiesta:", r.status_code)
+                            if flag == True:
+                                client.unsubscribe("/"+mserial)
+                                print("unsubscribed")
+
+                                r = requests.delete("http://"+backend_ip+":8080/nearbyHeadphones/delete?serial="+idHeadphones+"&mserial="+mserial)
+
+                                if r.status_code != 200:
+                                    print("Errore nella richiesta:", r.status_code)
 
 
 
