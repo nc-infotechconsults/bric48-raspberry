@@ -1,0 +1,6 @@
+Esegui il comando
+> python means.py
+Che eseguirà il codice main.py per ogni file nella cartella "files". 
+Ci metterà un po' a terminare. Alla fine troverai nella cartella "plot"
+i plot della predizione della voce per ogni file wav, e nel file "confidences.csv"
+le predizioni medie per ogni secondo di ogni file e la predizione risultante finale

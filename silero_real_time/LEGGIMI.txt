@@ -1,0 +1,5 @@
+esegui
+> python silero+leq.py
+
+per avere una stampa in real time della predizione del livello
+di voce e dei decibel

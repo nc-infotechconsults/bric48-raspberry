@@ -1,23 +1,18 @@
-import io
 import numpy as np
 import torch
 torch.set_num_threads(1)
 import torchaudio
 torchaudio.set_audio_backend("soundfile")
 import pyaudio
-import threading
-import os
-import math
 from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtCore import QCoreApplication
 from maad import spl
-import time
 import mic_add_v2_1 as mcr
 import sys
-import datetime
 
 ################################################# SILERO
 
+# carichiamo il modello silero vad
 model, utils = torch.hub.load(repo_or_dir='snakers4/silero-vad',
                               model='silero_vad',
                               force_reload=False)
@@ -28,32 +23,29 @@ model, utils = torch.hub.load(repo_or_dir='snakers4/silero-vad',
  VADIterator,
  collect_chunks) = utils
 
-def validate(model, inputs: torch.Tensor):
-    with torch.no_grad():
-        outs = model(inputs)
-    return outs
-
 def int2float(sound):
     abs_max = np.abs(sound).max()
     sound = sound.astype('float32')
     if abs_max > 0:
         sound *= 1/32768
-    sound = sound.squeeze()  # depends on the use case
+    sound = sound.squeeze() 
     return sound
 
-################################################# LEQ
 
 p = pyaudio.PyAudio()
-info = p.get_host_api_info_by_index(0)
-numdevices = info.get('deviceCount')
 
-################################################# ENTRAMBI
+
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
-SAMPLE_RATE = 48000
-CHUNK = int(SAMPLE_RATE / 10) #ogni chunck sono 1600 campioni
-#settaggio gain e sensibilità
+# il modello silero vad funziona con sample rate 16000 e chunk da 512, tuttavia i microfoni che impieghiamo non supportano
+# la registrazione a 16000 hz, ma solo a 48000 (che è il triplo di 16000) quindi triplichiamo anche il chunk così da ottenere
+# dei chunk proporzionati a quel sample rate e poi facciamo successivamente il resample a 16000, prima di applicare il modello
+# silero vad per la predizione della voce
+SAMPLE_RATE = 16000 * 3 #48000 
+CHUNK = 512 * 3 #1536
+
+#settaggio gain e sensibilità (codici forniti da università di perugia)
 gai=8
 sens=-32
 reg_leng=1  # aggiornato a un quarto di secondo
@@ -65,16 +57,10 @@ t_true=nfin*CHUNK/SAMPLE_RATE #tempo di campionamento vero
 t = 0
 Leq_tot=0
 
-################################################# SILERO
 
 data = []
-voiced_confidences = []
-
-global continue_recording
-continue_recording = True
-global new_confidence
-global voiced_confidence
-global line
+voiced_confidences = [] # lista che conterrà le predizioni su ogni chunk
+global new_confidence # contiene la predizione sull'ultimo chunk
 
 ################################################# MAIN LOOP
 
@@ -92,7 +78,6 @@ while True:
                     channels=CHANNELS,
                     rate=SAMPLE_RATE,
                     input=True,
-                    #input_device_index=DEV,
                     frames_per_buffer=CHUNK)
 
     frames = []                                            
@@ -101,12 +86,11 @@ while True:
         frames.append(data)         
         audio_int16 = np.frombuffer(data, np.int16) # converte i dati grezzi che ha letto in campioni audio a 16 bit
         audio_float32 = int2float(audio_int16) # converte i campioni a 16 bit in 32 bit usando la funzione prima definita
-        
         # Resample from 48000 Hz to 16000 Hz
         audio_resampled = resample_transform(torch.from_numpy(audio_float32))
-        new_confidence = model(audio_resampled, 16000).item() # passiamo al modello il campione in 32 bit
+        new_confidence = model(audio_resampled, 16000).item() # passiamo al modello il campione in 32 bit a 16000 hz
 
-    #print("livello della voce: ", new_confidence)                    
+                    
     stream.stop_stream()
     stream.close()
     #normalizzazione del segnale fatta UNIPG
@@ -118,7 +102,9 @@ while True:
     #equivalent sound pressure level 
     #questi è il leq del singolo pezzo
     Leq_result = spl.wav2leq(w, SAMPLE_RATE, gain=gai, dt=len(w)/SAMPLE_RATE, sensitivity=sens)
-    #print("Equivalent Continuous Sound pressure Level Leq (dB):", mcr.decimali(Leq_result))
+
+
+    # stampiamo sia il livello di voce predetto che il rumore dell'area in decibel
     print("voce: ", new_confidence," LEQ: ", mcr.decimali(Leq_result))
     Lp=mcr.levelsoct(sound_pressure, pond)
     t=t+t_true
@@ -128,7 +114,6 @@ while True:
         s=s+summ
         #questo è il leq totale
         Leq=mcr.decimali(10*np.log10((1/1)*s))
-    #print("Leq (dB): ", Leq)
                 
             
     #questo è il livello equivalente mediato su tutto il periodo

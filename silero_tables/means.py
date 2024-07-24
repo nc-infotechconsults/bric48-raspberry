@@ -9,7 +9,8 @@ files_dir = "files"
 
 
 
-# Funzione per svuotare la cartella
+# Funzione per svuotare la cartella. La usiamo per svuotare la cartella che contiene
+# i plot in pdf
 def svuota_cartella(cartella):
     for filename in os.listdir(cartella):
         file_path = os.path.join(cartella, filename)
@@ -23,12 +24,10 @@ def svuota_cartella(cartella):
 
 
 
-
+# funzione per svuotare il contenuto del file csv in cui sono scritte le predizioni, e scrivere il nuovo header
 def cancella_contenuto_file(filepath):
     try:
-        # Apri il file in modalità scrittura ('w'), se non esiste verrà creato
         with open(filepath, 'w') as f:
-            # Scrivi l'intestazione nel file
             f.write("File name; voice_1_group; voice_2_group; voice_3_group; voice_4_group; voice_5_group; voice_6_group; voice_7_group; voice_mean\n")
     except Exception as e:
         print(f"Errore durante la cancellazione del contenuto del file {filepath}. Dettagli: {e}")
@@ -36,7 +35,7 @@ def cancella_contenuto_file(filepath):
 
 
 
-# Funzione per ottenere tutti i file .wav dalla cartella
+# Funzione per ottenere tutti i file .wav dalla cartella "files" che li contiene
 def ottieni_file_wav(cartella):
     try:
         return [f for f in os.listdir(cartella) if f.endswith('.wav')]
@@ -56,7 +55,7 @@ cancella_contenuto_file(confidences_file)
 # Ottieni tutti i file .wav dalla cartella "files"
 file_wav_list = ottieni_file_wav(files_dir)
 
-# Esegui il comando per ogni file .wav trovato
+# Per ogni file .wav nella cartella files eseguiamo il codice "main.py"
 for file_wav in file_wav_list:
     comando = ["python", "main.py", os.path.join(files_dir, file_wav)]
     try:

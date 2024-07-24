@@ -1,0 +1,5 @@
+esegui
+> python main.py <path file wav>
+ad esempio
+> python main.py sega/sega_taglio_ferro.wav
+per avere la riproduzione in real time e il plot in real time del livello della voce predetto

@@ -1,0 +1,5 @@
+Quando avvii il codice noterai che viene stampato il mac del raspberry.
+Questo mac deve essere inserito nel database come seriale di una cuffia. 
+Inoltre affinché tutto quanto funzioni, quando avvii il codice con
+> python ble_mqtt.py <ip su cui è in esecuzione il backend>
+devi avere il backend in esecuzione
