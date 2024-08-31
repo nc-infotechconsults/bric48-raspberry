@@ -1,0 +1,5 @@
+Esegui il comando
+> python dashboard.py
+Poi dalla dashboard seleziona il file che ti interessa. Ti verrà generato il plot in pdf del file. 
+Ti verrà anche aggiunta la riga nel file csv. L'audio lo puoi riprodurre o mettere in pausa. Puoi anche
+selezionare il livello del filtro dsp da applicare e ti verrà generato un file audio con quel filtro applicato. 

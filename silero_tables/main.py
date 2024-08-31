@@ -21,7 +21,7 @@ parser = argparse.ArgumentParser(description="Voice Activity Detection")
 parser.add_argument('file_path', type=str, help='Path to the audio file')
 args = parser.parse_args()
 
-# carichiamo il modello silero ad
+# carichiamo il modello silero vad
 model, utils = torch.hub.load(repo_or_dir='snakers4/silero-vad',
                               model='silero_vad',
                               force_reload=False)

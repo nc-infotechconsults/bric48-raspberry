@@ -83,6 +83,7 @@ while True:
     frames = []                                            
     for i in range(0, nfin):
         data = stream.read(CHUNK, exception_on_overflow=False)
+
         frames.append(data)         
         audio_int16 = np.frombuffer(data, np.int16) # converte i dati grezzi che ha letto in campioni audio a 16 bit
         audio_float32 = int2float(audio_int16) # converte i campioni a 16 bit in 32 bit usando la funzione prima definita
