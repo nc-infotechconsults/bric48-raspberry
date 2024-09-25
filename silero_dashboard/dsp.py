@@ -22,9 +22,9 @@ def main():
         audio.export(output_file_path, format="wav")
 
         # Stampa i valori e il percorso del file salvato
-        print(f"Numero selezionato: {selected_number}")
+        print(f"Filtro selezionato: {selected_number}")
         print(f"Nome del file originale: {file_path}")
-        print(f"File salvato con volume aumentato: {output_file_path}")
+        #print(f"File salvato con volume aumentato: {output_file_path}")
 
     except Exception as e:
         print(f"Errore durante l'elaborazione del file: {e}")

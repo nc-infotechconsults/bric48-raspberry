@@ -1,4 +1,67 @@
-File name; voice_1_group; voice_2_group; voice_3_group; voice_4_group; voice_5_group; voice_6_group; voice_7_group; voice_mean
-amb_comevcaffè_1_fede.wav;0.30449190529907355;0.7257586624473333;0.635263932403177;0.578134496929124;0.5082868030294776;0.3343945178203285;0.1629432852451618;0.4724729155508562
-amb_comevcaffè_1_luca.wav;0.621544226698461;0.9595862049609423;0.993925366550684;0.9905517809092999;0.9706924930214882;0.977832842618227;0.9690682291984558;0.9249909506029869
-amb_comevcaffè_1_luca_2.wav;0.0396247891621897;0.3309293738566339;0.25669624423608184;0.18355899618472904;0.15413326234556735;0.19880959810689092;0.10969530318218929;0.18390894645543068
+NOME DEL FILE; SORGENTE RUMOROSA; POSIZIONE OPERATORE; POSIZIONE VOCE; NOME VOCE;SECONDO NUMERO 1 (VAD e LEQ);SECONDO NUMERO 2 (VAD e LEQ);SECONDO NUMERO 3 (VAD e LEQ);SECONDO NUMERO 4 (VAD e LEQ);SECONDO NUMERO 5 (VAD e LEQ);SECONDO NUMERO 6 (VAD e LEQ);SECONDO NUMERO 7 (VAD e LEQ);LIVELLO MEDIO (VAD e LEQ)
+amb_comevcaffè_1_fede.wav; rumore ambientale; comevcaffè; 1 metri da comevcaffè; fede;0.30449;0.72576;0.63526;0.57813;0.50829;0.33439;0.16294;0.47247
+;;;;;88.4;90.5;89.4;90.4;89.7;89.1;91.5;89.9
+amb_comevcaffè_1_luca.wav; rumore ambientale; comevcaffè; 1 metri da comevcaffè; luca;0.62154;0.95959;0.99393;0.99055;0.97069;0.97783;0.96907;0.92499
+;;;;;96.8;94.1;94.8;95.5;94.8;93.5;93.3;94.7
+amb_comevcaffè_1_luca2.wav; rumore ambientale; comevcaffè; 1 metri da comevcaffè; luca2;0.03962;0.33093;0.25670;0.18356;0.15413;0.19881;0.10970;0.18391
+;;;;;89.3;90.8;89.4;92.5;88.9;89.2;88.7;89.8
+amb_comevcaffè_2_fede.wav; rumore ambientale; comevcaffè; 2 metri da comevcaffè; fede;0.05364;0.52795;0.17053;0.17393;0.09019;0.09173;0.03161;0.16641
+;;;;;88.3;91.9;91.1;90.0;89.6;90.2;90.6;90.2
+amb_comevcaffè_2_luca.wav; rumore ambientale; comevcaffè; 2 metri da comevcaffè; luca;0.21601;0.61972;0.74389;0.35700;0.17646;0.15510;0.18609;0.35514
+;;;;;90.0;90.5;92.0;90.0;91.7;89.9;90.1;90.6
+amb_comevcaffè_2_luca2.wav; rumore ambientale; comevcaffè; 2 metri da comevcaffè; luca2;0.01990;0.01448;0.03803;0.06189;0.02141;0.02754;0.00877;0.02794
+;;;;;87.7;90.8;88.9;92.2;89.3;89.1;88.5;89.5
+amb_comevcaffè_3_fede.wav; rumore ambientale; comevcaffè; 3 metri da comevcaffè; fede;0.11551;0.11094;0.01949;0.07220;0.01329;0.05868;0.04147;0.06221
+;;;;;86.5;88.7;87.7;88.4;88.6;88.2;89.6;88.2
+molaamano_1_1_luca.wav; molaamano; 1 metri dal rumore; 1 metri dal rumore; luca;0.31078;0.94469;0.98444;0.99422;0.99695;0.97069;0.92728;0.87415
+;;;;;99.1;99.8;100.6;101.3;102.6;99.2;97.6;100.0
+molaamano_1_1_luca2.wav; molaamano; 1 metri dal rumore; 1 metri dal rumore; luca2;0.34996;0.70865;0.70018;0.84961;0.84059;0.80435;0.84372;0.72497
+;;;;;95.9;97.7;97.9;97.4;97.2;96.7;96.4;97.0
+molaamano_1_2_luca.wav; molaamano; 1 metri dal rumore; 2 metri dal rumore; luca;0.09432;0.57475;0.90392;0.93364;0.90422;0.88070;0.88381;0.73536
+;;;;;94.1;96.8;95.8;96.8;96.2;95.2;95.4;95.8
+molaamano_1_2_luca2.wav; molaamano; 1 metri dal rumore; 2 metri dal rumore; luca2;0.02711;0.45380;0.71760;0.77474;0.72002;0.78983;0.48933;0.56964
+;;;;;93.9;96.4;96.4;96.9;97.2;97.4;95.6;96.3
+molaamano_1_3_luca.wav; molaamano; 1 metri dal rumore; 3 metri dal rumore; luca;0.07422;0.24493;0.04252;0.01320;0.00682;0.00876;0.00358;0.05774
+;;;;;92.2;91.1;95.4;95.4;94.8;95.0;94.1;94.0
+molaamano_1_3_luca2.wav; molaamano; 1 metri dal rumore; 3 metri dal rumore; luca2;0.02000;0.04527;0.01822;0.00875;0.00558;0.00375;0.00215;0.01517
+;;;;;93.1;94.4;96.7;96.7;96.3;96.9;95.0;95.6
+molaamano_1_3_lucav2.wav; molaamano; 1 metri dal rumore; 3 metri dal rumore; lucav2;0.01994;0.03531;0.06989;0.02091;0.02642;0.09319;0.10959;0.05206
+;;;;;92.6;95.7;95.2;95.8;95.5;97.1;96.5;95.5
+sega_1_1_lori.wav; sega; 1 metri dal rumore; 1 metri dal rumore; lori;0.53290;0.92718;0.98945;0.98815;0.98329;0.98124;0.98487;0.91045
+;;;;;91.0;93.2;93.5;91.8;91.8;92.3;93.1;92.4
+sega_1_1_luca.wav; sega; 1 metri dal rumore; 1 metri dal rumore; luca;0.61936;0.99395;0.99828;0.99238;0.99738;0.99523;0.99354;0.94001
+;;;;;94.5;94.1;95.7;95.8;93.6;97.0;95.3;95.2
+sega_1_2_lori.wav; sega; 1 metri dal rumore; 2 metri dal rumore; lori;0.06362;0.07106;0.03760;0.12801;0.12342;0.05698;0.07753;0.07981
+;;;;;88.6;90.4;90.0;89.1;89.3;89.0;89.8;89.4
+sega_1_2_luca.wav; sega; 1 metri dal rumore; 2 metri dal rumore; luca;0.51024;0.87373;0.95482;0.95358;0.96649;0.96666;0.95479;0.88092
+;;;;;90.2;92.5;92.6;93.4;92.7;91.2;91.6;92.0
+sega_1_3_lori.wav; sega; 1 metri dal rumore; 3 metri dal rumore; lori;0.07499;0.05348;0.06212;0.02983;0.15252;0.21654;0.12199;0.10108
+;;;;;89.0;89.3;89.8;89.2;89.6;92.0;88.5;89.6
+sega_1_3_luca.wav; sega; 1 metri dal rumore; 3 metri dal rumore; luca;0.06582;0.08746;0.07295;0.15296;0.18662;0.21589;0.18135;0.13637
+;;;;;87.0;90.7;90.8;90.8;91.8;90.8;90.4;90.3
+sega_1_neg1_lori.wav; sega; 1 metri dal rumore; -1 metri dal rumore; lori;0.19465;0.11515;0.23706;0.18718;0.14773;0.22412;0.33331;0.20209
+;;;;;89.2;90.8;90.8;90.1;89.5;91.2;89.7;90.2
+sega_1_neg1_luca.wav; sega; 1 metri dal rumore; -1 metri dal rumore; luca;0.29562;0.33216;0.51621;0.57471;0.41819;0.43675;0.42681;0.42869
+;;;;;88.7;91.8;91.1;90.3;89.7;90.1;91.7;90.5
+tornio_1_1_fede.wav; tornio; 1 metri dal rumore; 1 metri dal rumore; fede;0.35762;0.92065;0.87179;0.83842;0.88405;0.70195;0.82470;0.76984
+;;;;;91.3;93.6;93.0;94.5;93.5;92.1;93.1;93.0
+tornio_1_1_luca.wav; tornio; 1 metri dal rumore; 1 metri dal rumore; luca;0.62262;0.96582;0.99632;0.99430;0.98315;0.98786;0.99662;0.93355
+;;;;;94.9;98.7;98.7;98.6;96.3;96.7;96.2;97.1
+tornio_1_1_luca2.wav; tornio; 1 metri dal rumore; 1 metri dal rumore; luca2;0.37889;0.59676;0.31335;0.07569;0.17255;0.23042;0.25149;0.28947
+;;;;;89.1;91.6;91.2;90.3;91.4;91.8;91.0;90.9
+tornio_1_2_fede.wav; tornio; 1 metri dal rumore; 2 metri dal rumore; fede;0.04076;0.02435;0.02107;0.04261;0.05259;0.02708;0.03761;0.03509
+;;;;;88.9;90.0;90.2;90.4;89.6;90.0;90.7;90.0
+tornio_1_2_luca.wav; tornio; 1 metri dal rumore; 2 metri dal rumore; luca;0.15476;0.68102;0.50738;0.30519;0.40213;0.17144;0.21240;0.35149
+;;;;;89.1;93.5;92.2;91.9;93.0;94.3;92.8;92.4
+tornio_1_2_luca2.wav; tornio; 1 metri dal rumore; 2 metri dal rumore; luca2;0.02709;0.01434;0.01195;0.00559;0.00715;0.01315;0.01267;0.01315
+;;;;;87.0;89.1;89.3;88.9;89.7;89.2;89.4;88.9
+tornio_1_3_fede.wav; tornio; 1 metri dal rumore; 3 metri dal rumore; fede;0.03216;0.03526;0.02126;0.00565;0.00560;0.00425;0.00283;0.01563
+;;;;;87.5;88.9;89.3;88.6;89.0;89.0;88.5;88.7
+tornio_1_3_luca.wav; tornio; 1 metri dal rumore; 3 metri dal rumore; luca;0.05555;0.10429;0.14421;0.21559;0.09334;0.20387;0.12012;0.13423
+;;;;;88.3;93.4;90.8;91.6;89.9;91.5;91.2;91.0
+tornio_1_3_luca2.wav; tornio; 1 metri dal rumore; 3 metri dal rumore; luca2;0.01864;0.03412;0.03722;0.01017;0.00873;0.00357;0.00724;0.01737
+;;;;;86.6;88.9;88.8;88.1;88.1;88.7;89.0;88.3
+tornio_1_neg1_luca.wav; tornio; 1 metri dal rumore; -1 metri dal rumore; luca;0.23724;0.53916;0.76382;0.79133;0.80820;0.79863;0.78656;0.67192
+;;;;;88.8;93.7;96.1;94.0;93.6;93.3;92.8;93.2
+tornio_1_neg1_luca2.wav; tornio; 1 metri dal rumore; -1 metri dal rumore; luca2;0.07554;0.01755;0.06478;0.01820;0.01133;0.00943;0.03209;0.03272
+;;;;;88.9;90.0;90.6;89.7;89.2;89.1;89.7;89.6

@@ -140,12 +140,14 @@ ax1.set_ylabel('Voice Confidence', color='blue')
 ax1.tick_params(axis='y', labelcolor='blue')
 ax1.grid(True)
 
+
 # Create a secondary y-axis for Leq_list
 ax2 = ax1.twinx()
-ax2.plot(np.arange(len(Leq_list)), Leq_list, lw=2, color='red', label='Leq')
+ax2.plot(np.arange(1, len(Leq_list) + 1), Leq_list, lw=2, color='red', label='Leq')
 ax2.set_ylim(min(Leq_list) - 5, max(Leq_list) + 5)
 ax2.set_ylabel('Leq (dB)', color='red')
 ax2.tick_params(axis='y', labelcolor='red')
+
 
 # Title and legends
 ax1.set_title('Voice Activity Detection and Leq over Time')
