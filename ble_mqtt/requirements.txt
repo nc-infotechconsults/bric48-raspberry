@@ -1,0 +1,4 @@
+bluepy
+requests
+getmac
+paho-mqtt
