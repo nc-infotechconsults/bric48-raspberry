@@ -24,7 +24,7 @@ class BleController(object):
         async with BleakScanner() as scanner:
             await scanner.discover(timeout=1, return_adv=True)
             for addr, dev_adv in scanner.discovered_devices_and_advertisement_data.items():
-                logger.info("Device: %s, RSSI: %s", addr, dev_adv[1].rssi)
+                logger.debug("Device: %s, RSSI: %s", addr, dev_adv[1].rssi)
                 
                 if addr in self.beacon_serials:
                     if dev_adv[1].rssi > -self.beacons_threshold[addr]:

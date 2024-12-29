@@ -1,8 +1,8 @@
-import requests
 import logging
 
+import requests
+from backend.filters import FilterCriteriaDTO, FiltersDTO
 from getmac import get_mac_address
-from backend.filters import FiltersDTO, FilterCriteriaDTO
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +23,7 @@ class RestClient(object):
 
     def get_user_info(self):
         # get mac address
-        # headphone_serial = get_mac_address()
-        headphone_serial = "123456789"
+        headphone_serial = get_mac_address()
 
         logger.info("Obtain user info by serial: %s", headphone_serial)
 

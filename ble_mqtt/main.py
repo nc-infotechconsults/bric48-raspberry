@@ -43,9 +43,6 @@ def main():
         # connect mqtt
         mqtt_client.connect()
         
-        # subscribe to topic 
-        mqtt_client.subscribe()
-        
         # creating ble controller
         ble_controller = BleController(machineries, mqtt_client)
         

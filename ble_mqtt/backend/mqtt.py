@@ -20,15 +20,25 @@ class MqttClient(object):
 
     def connect(self):
         logger.info("Connection to %s:%s with client id: %s", self.mqtt_host, self.mqtt_port, self.client_id)
-        self.client.loop_start()
+        self.client.on_connect = self.on_connect
+        self.client.on_message = self.on_message
         self.client.connect(self.mqtt_host, self.mqtt_port)
+        self.client.loop_start()
+        
+    def on_message(self, client, userdata, msg):
+            logger.info(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+            message = json.loads(msg.payload.decode())
+            # TODO: insert from here the AI management
+            
+    def on_connect(self, client, userdata, flags, rc):
+        if rc == 0:
+            logger.info("Connected successfully to MQTT broker")
+            self.subscribe()
+        else:
+            logger.error("Failed to connect, return code %d", rc)
 
     def subscribe(self):
-        def on_message(client, userdata, msg):
-            logger.info(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
-            # TODO: insert from year the AI management
-
-        self.client.on_message = on_message
+        logging.info("Subscribing to topic: %s", get_mac_address())
         self.client.subscribe(get_mac_address())
     
     def user_near_machinery(self, machinery_id):
