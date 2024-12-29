@@ -1,13 +1,13 @@
 import argparse
+import asyncio
 import logging
-import time
 
-from ble.controller import BleController
 from backend.mqtt import MqttClient
 from backend.rest import RestClient
+from ble.controller import BleController
 
 # configure logging
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     format="{asctime} - {name} -  {levelname} - {message}", style="{", datefmt="%Y-%m-%d %H:%M:%S")
 logger = logging.getLogger(__name__)
 
@@ -27,18 +27,18 @@ def main():
     logger.info('Connecting to mqtt broker: %s:%s',args.mqtt_host, args.mqtt_port)
     
     try:
-        # Creating objects
-        mqtt_client = MqttClient(args.mqtt_host, args.mqtt_port)
+        # Creating rest client
         rest_client = RestClient(args.backend_base_url)
-        ble_controller = BleController()
         
         # obtain user info 
         user_info = rest_client.get_user_info()
         user_language = user_info['language']   # used to reproduce the correct voice
         
+        # create mqtt client
+        mqtt_client = MqttClient(args.mqtt_host, args.mqtt_port, args.topic_user_near, args.topic_user_far, user_info['id'])
+        
         # obtain machineries map
         machineries = rest_client.get_all_machineries()
-        print(machineries)
         
         # connect mqtt
         mqtt_client.connect()
@@ -46,13 +46,19 @@ def main():
         # subscribe to topic 
         mqtt_client.subscribe()
         
+        # creating ble controller
+        ble_controller = BleController(machineries, mqtt_client)
+        
         try:
-            ble_controller.scan()
+            while True:
+                asyncio.run(ble_controller.scan())
         except KeyboardInterrupt:
+            for machinery in machineries:
+                mqtt_client.user_far_machinery(machinery['id'])
             mqtt_client.disconnect()
-            
     except Exception as e:
-        print(e)
+        for machinery in machineries:
+            mqtt_client.user_far_machinery(machinery['id'])
         mqtt_client.disconnect()
         exit(-1)
 
